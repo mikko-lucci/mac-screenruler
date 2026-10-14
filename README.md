@@ -33,5 +33,11 @@ toleranssin, värikanavittaisen tunnistuksen, jatkuvan näytönkaappauksen, viiv
 
 Reunantunnistus lukee näytön pikseleitä, joten sovellus tarvitsee luvan kohdasta
 *Järjestelmäasetukset → Tietosuoja ja suojaus → Näytön ja äänen tallennus*.
-Ad hoc -allekirjoitetussa versiossa lupa voi nollautua jokaisen uudelleenkäännöksen jälkeen.
-Jos käytössäsi on kehittäjävarmenne, anna se allekirjoitukseen: `SIGN_ID="Apple Development: …" ./build.sh`.
+macOS sitoo luvan sovelluksen allekirjoitukseen. Ad hoc -allekirjoitus muuttuu jokaisessa käännöksessä,
+jolloin lupaa kysytään uudelleen. Luo siksi kerran paikallinen allekirjoitusvarmenne:
+
+```bash
+./Scripts/create-signing-cert.sh
+```
+
+`build.sh` käyttää sitä automaattisesti. Toisen identiteetin voi antaa näin: `SIGN_ID="Apple Development: …" ./build.sh`.

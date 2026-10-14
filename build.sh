@@ -1,7 +1,8 @@
 #!/bin/bash
 # Builds build/ScreenRuler.app.  Usage: ./build.sh [install]
-#   SIGN_ID="Apple Development: ..." ./build.sh   – sign with a real identity
-#   (keeps the Screen Recording permission between rebuilds; ad-hoc is the default)
+#   SIGN_ID="Apple Development: ..." ./build.sh   – sign with a specific identity
+# By default signs with "ScreenRuler Local Signing" (Scripts/create-signing-cert.sh)
+# so the Screen Recording permission survives rebuilds; falls back to ad-hoc.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -27,7 +28,16 @@ if [ ! -f Resources/AppIcon.icns ]; then
 fi
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
-codesign --force --sign "${SIGN_ID:--}" "$APP"
+if [ -z "${SIGN_ID:-}" ]; then
+    if security find-certificate -c "ScreenRuler Local Signing" >/dev/null 2>&1; then
+        SIGN_ID="ScreenRuler Local Signing"
+    else
+        SIGN_ID="-"
+        echo "Varoitus: ad hoc -allekirjoitus, näytön tallennuslupa nollautuu jokaisen käännöksen jälkeen."
+        echo "Aja Scripts/create-signing-cert.sh kerran, niin lupa säilyy."
+    fi
+fi
+codesign --force --sign "$SIGN_ID" "$APP"
 echo "Valmis: $APP"
 
 if [ "${1:-}" = "install" ]; then
